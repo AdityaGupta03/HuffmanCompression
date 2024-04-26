@@ -1,14 +1,18 @@
 #include <cstddef>
+#include <functional>
+#include <queue>
 #include <string>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
+#include <vector>
 
 #include "./FileCompression.h"
 
 
-FileCompression::FileCompression(std::string file_name)
+FileCompression::FileCompression(std::string file_name) noexcept(false)
 {
     std::fstream in_file(file_name, std::ios::in);
     if (!in_file) {
@@ -27,18 +31,56 @@ FileCompression::~FileCompression()
 {
 }
 
-void FileCompression::compressFile()
+void FileCompression::compressFile() noexcept(false)
 {
-    // Huffman compression
-    // 1. Count frequency of each character
-    // 2. Create a priority queue of nodes
-    // 3. Create a huffman tree
-    // 4. Create a huffman code table
-    // 5. Encode the file
-    // 6. Write the encoded file to a new file
+    // Handle empty file
+    if (this->contents.empty()) {
+        throw std::ios_base::failure("File is empty!");
+    }
 
+    // Build frequency table of each character
+    std::unordered_map<char, int> freq_table;
+    for (char c : this->contents) {
+        freq_table[c]++;
+    }
+
+    // Create a min_queue based on frequency
+    std::priority_queue<FrequencyNode*, std::vector<FrequencyNode*>, FreqNodeComparator> pq;
+    for (auto iter : freq_table) {
+        pq.push(new FrequencyNode{ .value = iter.first, .freq = iter.second });
+    }
+
+    while (pq.size() > 1) {
+        FrequencyNode* left = pq.top();
+        pq.pop();
+        FrequencyNode* right = pq.top();
+        pq.pop();
+
+        FrequencyNode* parent = new FrequencyNode{ .value = '\0', .freq = left->freq + right->freq };
+        parent->left = left;
+        parent->right = right;
+
+        pq.push(parent);
+    }
+
+    FrequencyNode* root = pq.top();
+    pq.pop();
+    this->generateEncodings(root, "");
 }
 
 void FileCompression::decompressFile()
 {
+}
+
+void FileCompression::generateEncodings(FrequencyNode* node, std::string encoding) {
+    if (!node) {
+        return;
+    }
+
+    if (!node->left && !node->right) {
+        this->encodings[node->value] = encoding;
+    }
+
+    this->generateEncodings(node->left, encoding + "0");
+    this->generateEncodings(node->right, encoding + "1");
 }

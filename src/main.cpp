@@ -17,6 +17,8 @@ int main(int argc, char** argv) {
         std::cout << "Attempting to load file: " << argv[1] << std::endl;
         FileCompression file = FileCompression(argv[1]);
         std::cout << file.contents << std::endl;
+
+        file.compressFile();
     } catch (const std::ios_base::failure& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
