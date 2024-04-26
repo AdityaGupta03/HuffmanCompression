@@ -29,12 +29,23 @@ FileCompression::FileCompression(std::string file_name) noexcept(false)
 
 FileCompression::~FileCompression()
 {
+    this->deleteTree(this->root);
+}
+
+void FileCompression::deleteTree(FrequencyNode* node) {
+    if (!node) {
+        return;
+    }
+
+    this->deleteTree(node->left);
+    this->deleteTree(node->right);
+    delete node;
 }
 
 void FileCompression::compressFile() noexcept(false)
 {
     // Handle empty file
-    if (this->contents.empty()) {
+    if (this->contents.empty()) {;
         throw std::ios_base::failure("File is empty!");
     }
 
