@@ -63,9 +63,9 @@ void FileCompression::compressFile() noexcept(false)
         pq.push(parent);
     }
 
-    FrequencyNode* root = pq.top();
+    this->root = pq.top();
     pq.pop();
-    this->generateEncodings(root, "");
+    this->generateEncodings(this->root, "");
 }
 
 void FileCompression::decompressFile()

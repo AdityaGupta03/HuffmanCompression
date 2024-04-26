@@ -29,5 +29,7 @@ public:
 
 private:
     std::unordered_map<char, std::string> encodings;
+    FrequencyNode* root;
+
     void generateEncodings(FrequencyNode*, std::string);
 };
