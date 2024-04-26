@@ -61,6 +61,7 @@ void FileCompression::compressFile() noexcept(false)
         pq.push(new FrequencyNode{ .value = iter.first, .freq = iter.second });
     }
 
+    // Create huffman tree
     while (pq.size() > 1) {
         FrequencyNode* left = pq.top();
         pq.pop();
@@ -73,10 +74,14 @@ void FileCompression::compressFile() noexcept(false)
 
         pq.push(parent);
     }
-
     this->root = pq.top();
     pq.pop();
+
+    // Generate huffman encodings
     this->generateEncodings(this->root, "");
+
+    // Compress the original file
+    // TODO
 }
 
 void FileCompression::decompressFile()
