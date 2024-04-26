@@ -1,3 +1,7 @@
+# Build related files/folders
 build
+build-debug
+.cache
 
+# Testing input file
 input.txt
