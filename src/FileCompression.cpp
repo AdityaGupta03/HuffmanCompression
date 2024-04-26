@@ -32,7 +32,8 @@ FileCompression::~FileCompression()
     this->deleteTree(this->root);
 }
 
-void FileCompression::deleteTree(FrequencyNode* node) {
+void FileCompression::deleteTree(FrequencyNode* node)
+{
     if (!node) {
         return;
     }
@@ -88,7 +89,8 @@ void FileCompression::decompressFile()
 {
 }
 
-void FileCompression::generateEncodings(FrequencyNode* node, std::string encoding) {
+void FileCompression::generateEncodings(FrequencyNode* node, std::string encoding)
+{
     if (!node) {
         return;
     }

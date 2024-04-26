@@ -7,7 +7,8 @@
 
 #include "./FileCompression.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     if (argc != 2) {
         std::cerr << "Usage: ./FileCompression <filename>" << std::endl;
         return EXIT_FAILURE;
