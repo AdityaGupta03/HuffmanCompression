@@ -1,3 +1,6 @@
+# Editor specific files
+.zed
+
 # Build related files/folders
 build
 build-debug
