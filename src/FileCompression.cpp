@@ -7,10 +7,11 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <utility>
 #include <vector>
+#include <cassert>
 
 #include "./FileCompression.h"
-
 
 FileCompression::FileCompression(std::string file_name) noexcept(false)
 {
@@ -50,14 +51,34 @@ void FileCompression::compressFile() noexcept(false)
         throw std::ios_base::failure("File is empty!");
     }
 
-    // Build frequency table of each character
+    // Build frequency table from each character
     std::unordered_map<char, int> freq_table;
     for (char c : this->contents) {
         freq_table[c]++;
     }
 
+    this->root = this->buildHuffmanTree(freq_table);
+    this->generateEncodings(this->root); // Saves encodings to this->encodings
+
+    // TODO: Write compressed file
+}
+
+void FileCompression::decompressFile()
+{
+    assert(false); // Not implemented
+}
+
+FrequencyNode* FileCompression::buildHuffmanTree(std::unordered_map<char, int> freq_table)
+{
+    // Define custom comparator for min_queue
+    struct min_queue_compare {
+        bool operator()(FrequencyNode* left, FrequencyNode* right) {
+            return left->freq > right->freq;
+        }
+    };
+
     // Create a min_queue based on frequency
-    std::priority_queue<FrequencyNode*, std::vector<FrequencyNode*>, FreqNodeComparator> pq;
+    std::priority_queue<FrequencyNode*, std::vector<FrequencyNode*>, min_queue_compare> pq;
     for (auto iter : freq_table) {
         pq.push(new FrequencyNode{ .value = iter.first, .freq = iter.second });
     }
@@ -75,30 +96,29 @@ void FileCompression::compressFile() noexcept(false)
 
         pq.push(parent);
     }
-    this->root = pq.top();
+
+    FrequencyNode* tree_root = pq.top();
     pq.pop();
-
-    // Generate huffman encodings
-    this->generateEncodings(this->root, "");
-
-    // Compress the original file
-    // TODO
+    return tree_root;
 }
 
-void FileCompression::decompressFile()
+void FileCompression::generateEncodings(FrequencyNode* tree_root)
 {
-}
+    std::queue<std::pair<FrequencyNode*, std::string>> encode_q;
+    encode_q.push({tree_root, ""});
+    while (!encode_q.empty()) {
+        auto [node, encoding] = encode_q.front();
+        encode_q.pop();
 
-void FileCompression::generateEncodings(FrequencyNode* node, std::string encoding)
-{
-    if (!node) {
-        return;
+        if (!node) {
+            continue;
+        }
+
+        if (!node->left && !node->right) {
+            this->encodings[node->value] = encoding;
+        }
+
+        encode_q.push({ node->left, encoding + "0" });
+        encode_q.push({ node->right, encoding + "1" });
     }
-
-    if (!node->left && !node->right) {
-        this->encodings[node->value] = encoding;
-    }
-
-    this->generateEncodings(node->left, encoding + "0");
-    this->generateEncodings(node->right, encoding + "1");
 }

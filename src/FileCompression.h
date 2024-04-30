@@ -11,12 +11,6 @@ struct FrequencyNode {
     FrequencyNode* right;
 };
 
-struct FreqNodeComparator {
-    bool operator()(FrequencyNode* left, FrequencyNode* right) {
-        return left->freq > right->freq;
-    }
-};
-
 class FileCompression {
 public:
     std::string contents;
@@ -32,5 +26,6 @@ private:
     FrequencyNode* root;
 
     void deleteTree(FrequencyNode* node);
-    void generateEncodings(FrequencyNode*, std::string);
+    FrequencyNode* buildHuffmanTree(std::unordered_map<char, int> freq_table);
+    void generateEncodings(FrequencyNode* tree_root);
 };
